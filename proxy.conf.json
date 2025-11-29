@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "http://galalshaaban99-001-site1.anytempurl.com",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
