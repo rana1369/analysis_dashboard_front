@@ -35,43 +35,43 @@
     "scripts": [],
     "baseHref": "/"
   },
-"configurations": {
-  "production": {
-    "budgets": [
-      {
-        "type": "initial",
-        "maximumWarning": "2mb",
-        "maximumError": "3mb"
-      },
-      {
-        "type": "anyComponentStyle",
-        "maximumWarning": "2kb",
-        "maximumError": "4kb"
-      }
-    ],
-    "outputHashing": "all",
-    "optimization": true,
-    "sourceMap": false
+  "configurations": {
+    "production": {
+      "budgets": [
+        { "type": "initial", "maximumWarning": "2mb", "maximumError": "3mb" },
+        { "type": "anyComponentStyle", "maximumWarning": "2kb", "maximumError": "4kb" }
+      ],
+      "outputHashing": "all",
+      "optimization": true,
+      "sourceMap": false
+    },
+    "development": {
+      "buildOptimizer": false,
+      "optimization": false,
+      "sourceMap": true,
+      "vendorChunk": true,
+      "namedChunks": true,
+      "aot": false
+    }
   }
-}
-
-}
-,
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
+},
+"serve": {
+  "builder": "@angular-devkit/build-angular:dev-server",
+  "options": {
     "proxyConfig": "proxy.conf.json"
   },
-          "configurations": {
-            "production": {
-              "buildTarget": "rental-management-dashboard:build:production"
-            },
-            "development": {
-              "buildTarget": "rental-management-dashboard:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        }
+  "configurations": {
+    "production": {
+      "buildTarget": "rental-management-dashboard:build:production"
+    },
+    "development": {
+      "buildTarget": "rental-management-dashboard:build:development"
+    }
+  },
+  "defaultConfiguration": "development"
+}
+
+       
       }
     }
   },
@@ -79,4 +79,3 @@
     "analytics": "a21411bf-07c1-4e23-974d-14a404563df2"
   }
 }
-
