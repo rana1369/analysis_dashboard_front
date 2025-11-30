@@ -9,7 +9,8 @@ import { Brand, BrandFormData } from '../models/brand.model';
 })
 export class BrandService {
   private brands: Brand[] = [];
-  private apiUrl = `http://galalshaaban99-001-site1.anytempurl.com/api/Brand`;
+  //private apiUrl = `http://galalshaaban99-001-site1.anytempurl.com/api/`;
+private apiUrl = `${environment.apiUrl}/Brand`;
 
   constructor(private http: HttpClient) {
     // Initialize with mock data

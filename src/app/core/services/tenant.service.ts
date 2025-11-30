@@ -2,13 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TenantResponse } from './report.service';
+import { environment } from '@environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TenantService {
 
-  private apiUrl = 'http://galalshaaban99-001-site1.anytempurl.com/api/Tenant';
+  //private apiUrl = 'http://galalshaaban99-001-site1.anytempurl.com/api/Tenant';
+  private apiUrl = `${environment.apiUrl}/Tenant`;
 
   constructor(private http: HttpClient) { }
 
