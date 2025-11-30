@@ -35,26 +35,26 @@
     "scripts": [],
     "baseHref": "/"
   },
-  "configurations": {
-    "production": {
-      "budgets": [
-        {
-          "type": "initial",
-          "maximumWarning": "2mb",
-          "maximumError": "3mb"
-        },
-        {
-          "type": "anyComponentStyle",
-          "maximumWarning": "2kb",
-          "maximumError": "4kb"
-        }
-      ],
-      "outputHashing": "all",
-      "optimization": true,
-      "sourceMap": false,
-      "extractCss": true
-    }
+"configurations": {
+  "production": {
+    "budgets": [
+      {
+        "type": "initial",
+        "maximumWarning": "2mb",
+        "maximumError": "3mb"
+      },
+      {
+        "type": "anyComponentStyle",
+        "maximumWarning": "2kb",
+        "maximumError": "4kb"
+      }
+    ],
+    "outputHashing": "all",
+    "optimization": true,
+    "sourceMap": false
   }
+}
+
 }
 ,
         "serve": {
