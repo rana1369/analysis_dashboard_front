@@ -34,7 +34,8 @@
               "node_modules/primeicons/primeicons.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "baseHref": "/" 
           },
           "configurations": {
             "production": {
