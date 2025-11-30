@@ -18,6 +18,26 @@ export class RentalService {
       .get<{ data: Rental[] }>(`${this.apiUrl}/FilterTenants`)
       .pipe(map(res => res.data));
   }
+  getAllSales(TenantId:any): Observable<[]> {
+    return this.http
+      .get<any>(`${this.apiUrl}/FilterTenantSales?TenantId=${TenantId}`)
+      .pipe(map(res => res.data));
+  }
+  createSales(body:any):Observable<any>{
+    return this.http.post<any>(`${this.apiUrl}/AddTenantSales`,
+      body
+    )
+  }
+   createRents(body:any):Observable<any>{
+    return this.http.post<any>(`${this.apiUrl}/AddTenantRend`,
+      body
+    )
+  }
+  getAllRent(TenantId:any): Observable<[]> {
+    return this.http
+      .get<any>(`${this.apiUrl}/FilterTenantRent?TenantId=${TenantId}`)
+      .pipe(map(res => res.data));
+  }
 
   /** ✔ GET rental by ID (backend endpoint example — adjust if needed) */
   getRentalById(id: string): Observable<Rental> {

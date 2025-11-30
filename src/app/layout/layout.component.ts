@@ -177,18 +177,19 @@ export class LayoutComponent implements OnInit {
         routerLink: '/dashboard',
         command: () => this.router.navigate(['/dashboard'])
       },
+       {
+        label: this.i18n.translate('activities.title'),
+        icon: 'pi pi-briefcase',
+        routerLink: '/activities',
+        command: () => this.router.navigate(['/activities'])
+      },
       {
         label: this.i18n.translate('brands.title'),
         icon: 'pi pi-building',
         routerLink: '/brands',
         command: () => this.router.navigate(['/brands'])
       },
-      {
-        label: this.i18n.translate('activities.title'),
-        icon: 'pi pi-briefcase',
-        routerLink: '/activities',
-        command: () => this.router.navigate(['/activities'])
-      },
+     
       {
         label: this.i18n.translate('rentals.title'),
         icon: 'pi pi-file',

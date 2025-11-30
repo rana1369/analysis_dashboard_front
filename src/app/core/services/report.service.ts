@@ -1,114 +1,54 @@
 import { Injectable } from '@angular/core';
-import { Observable, combineLatest, map } from 'rxjs';
-import { BrandService } from './brand.service';
-import { RentalService } from './rental.service';
-import { FinancialService } from './financial.service';
-import { Rental } from '../models/rental.model';
-import { Brand } from '../models/brand.model';
-import { FinancialAnalysis } from '../models/financial.model';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import { TenantService } from './tenant.service';
+
+export interface TenantResponse {
+  data: any[];
+  message: string | null;
+  status: boolean;
+}
 
 export interface ReportData {
   brandName: string;
   contractType: string;
   rentalAmount: number | null;
-  percentageValue: number | null;
+  percentageValue?: number | null;
   startDate: Date;
-  endDate: Date;
+  endDate: Date | null;
   annualRevenue: number;
   profitLossStatus: string;
   profit: number;
   profitMargin: number;
 }
 
-export interface ReportFilters {
-  brandId?: string;
-  contractType?: string;
-  profitabilityStatus?: string;
-  startDate?: Date;
-  endDate?: Date;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class ReportService {
-  constructor(
-    private brandService: BrandService,
-    private rentalService: RentalService,
-    private financialService: FinancialService
-  ) {}
 
-  /* generateReport(filters?: ReportFilters): Observable<ReportData[]> {
-    return combineLatest([
-      this.brandService.getAllBrands(),
-      this.rentalService.getAllRentals(),
-      this.financialService.getFinancialAnalysis()
-    ]).pipe(
-      map(([brands, rentals, analyses]) => {
-        let filteredRentals = [...rentals];
-        let filteredAnalyses = [...analyses];
+  constructor(private tenantService: TenantService) {}
 
-        if (filters) {
-          if (filters.brandId) {
-            filteredRentals = filteredRentals.filter(r => r.brandId === filters.brandId);
-            filteredAnalyses = filteredAnalyses.filter(a => a.brandId === filters.brandId);
-          }
-
-          if (filters.contractType) {
-            filteredRentals = filteredRentals.filter(r => r.rentalType === filters.contractType);
-          }
-
-          if (filters.profitabilityStatus) {
-            filteredAnalyses = filteredAnalyses.filter(a => a.status === filters.profitabilityStatus);
-            filteredRentals = filteredRentals.filter(r => 
-              filteredAnalyses.some(a => a.rentalId === r.id)
-            );
-          }
-
-          if (filters.startDate) {
-            filteredRentals = filteredRentals.filter(r => r.startDate >= filters.startDate!);
-          }
-
-          if (filters.endDate) {
-            filteredRentals = filteredRentals.filter(r => r.endDate <= filters.endDate!);
-          }
-        }
-
-        return filteredRentals.map(rental => {
-           const brand = brands.find((b: Brand) => b.id === rental.brandId);
-          const analysis = filteredAnalyses.find(a => a.rentalId === rental.id);
-
-          return {
-            brandName: brand?.name || 'Unknown',
-            contractType: rental.rentalType,
-            rentalAmount: rental.rentalAmount || null,
-            percentageValue: rental.percentageValue || null,
-            startDate: rental.startDate,
-            endDate: rental.endDate,
-            annualRevenue: rental.expectedAnnualIncome,
-            profitLossStatus: analysis?.status || 'Unknown',
-            profit: analysis?.profit || 0,
-            profitMargin: analysis?.profitMargin || 0
-          };
-        });
-      })
-    );
+  // ⚡ Call Real API via TenantService
+  getTenantsFromRealApi(filters: any) {
+    return this.tenantService.filterTenants(filters);
   }
- */
+
+  // -------------------------------------------------------
+  // 📌 PDF Export
+  // -------------------------------------------------------
   exportToPDF(data: ReportData[]): void {
     const doc = new jsPDF();
-    
-    doc.text('Rental Management Report', 14, 15);
-    
+
+    doc.text('Rental Report', 14, 15);
+
     const tableData = data.map(item => [
       item.brandName,
       item.contractType,
-      item.rentalAmount?.toString() || item.percentageValue?.toString() + '%' || 'N/A',
-      item.startDate.toLocaleDateString(),
-      item.endDate.toLocaleDateString(),
+      item.rentalAmount ?? (item.percentageValue + '%'),
+      new Date(item.startDate).toLocaleDateString(),
+      item.endDate ? new Date(item.endDate).toLocaleDateString() : '—',
       item.annualRevenue.toFixed(2),
       item.profitLossStatus,
       item.profit.toFixed(2),
@@ -116,7 +56,10 @@ export class ReportService {
     ]);
 
     (doc as any).autoTable({
-      head: [['Brand', 'Contract Type', 'Rental Value', 'Start Date', 'End Date', 'Annual Revenue', 'Status', 'Profit', 'Margin %']],
+      head: [[
+        'Brand', 'Contract Type', 'Rental', 'Start', 'End',
+        'Annual Revenue', 'Status', 'Profit', 'Margin'
+      ]],
       body: tableData,
       startY: 20
     });
@@ -124,48 +67,60 @@ export class ReportService {
     doc.save('rental-report.pdf');
   }
 
+  // -------------------------------------------------------
+  // 📌 Export Excel
+  // -------------------------------------------------------
   exportToExcel(data: ReportData[]): void {
-    const worksheet = XLSX.utils.json_to_sheet(data.map(item => ({
-      'Brand Name': item.brandName,
-      'Contract Type': item.contractType,
-      'Rental Amount': item.rentalAmount,
-      'Percentage Value': item.percentageValue,
-      'Start Date': item.startDate.toLocaleDateString(),
-      'End Date': item.endDate.toLocaleDateString(),
-      'Annual Revenue': item.annualRevenue,
-      'Profit/Loss Status': item.profitLossStatus,
-      'Profit': item.profit,
-      'Profit Margin %': item.profitMargin
-    })));
+    const worksheet = XLSX.utils.json_to_sheet(
+      data.map(item => ({
+        Brand: item.brandName,
+        ContractType: item.contractType,
+        RentalAmount: item.rentalAmount,
+        Percentage: item.percentageValue,
+        StartDate: new Date(item.startDate).toLocaleDateString(),
+        EndDate: item.endDate ? new Date(item.endDate).toLocaleDateString() : '',
+        AnnualRevenue: item.annualRevenue,
+        Status: item.profitLossStatus,
+        Profit: item.profit,
+        ProfitMargin: item.profitMargin
+      }))
+    );
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Rentals Report');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Report');
     XLSX.writeFile(workbook, 'rental-report.xlsx');
   }
 
+  // -------------------------------------------------------
+  // 📌 Export CSV
+  // -------------------------------------------------------
   exportToCSV(data: ReportData[]): void {
-    const headers = ['Brand Name', 'Contract Type', 'Rental Amount', 'Percentage Value', 'Start Date', 'End Date', 'Annual Revenue', 'Profit/Loss Status', 'Profit', 'Profit Margin %'];
-    const csvContent = [
+    const headers = [
+      'Brand', 'ContractType', 'RentalAmount', 'Percentage',
+      'StartDate', 'EndDate', 'AnnualRevenue', 'Status',
+      'Profit', 'ProfitMargin'
+    ];
+
+    const csvData = [
       headers.join(','),
-      ...data.map(item => [
-        item.brandName,
-        item.contractType,
-        item.rentalAmount || '',
-        item.percentageValue || '',
-        item.startDate.toLocaleDateString(),
-        item.endDate.toLocaleDateString(),
-        item.annualRevenue,
-        item.profitLossStatus,
-        item.profit,
-        item.profitMargin
+      ...data.map(i => [
+        i.brandName,
+        i.contractType,
+        i.rentalAmount ?? '',
+        i.percentageValue ?? '',
+        new Date(i.startDate).toLocaleDateString(),
+        i.endDate ? new Date(i.endDate).toLocaleDateString() : '',
+        i.annualRevenue,
+        i.profitLossStatus,
+        i.profit,
+        i.profitMargin
       ].join(','))
     ].join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'rental-report.csv';
-    link.click();
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'rental-report.csv';
+    a.click();
   }
 }
-

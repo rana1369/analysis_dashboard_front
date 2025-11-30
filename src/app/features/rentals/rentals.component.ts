@@ -6,6 +6,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { I18nService } from '@shared/services/i18n.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { RentalDialogComponent } from './rental-dialog/rental-dialog.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-rentals',
@@ -86,7 +87,8 @@ import { RentalDialogComponent } from './rental-dialog/rental-dialog.component';
                 pButton 
                 icon="pi pi-pencil" 
                 class="p-button-rounded p-button-text"
-                (click)="openEditDialog(rental)"
+                  (click)="navigateToSaleRent(rental)"
+
               ></button>
             </td>
             <td *ngIf="canDelete()">
@@ -137,7 +139,8 @@ export class RentalsComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private dialogService: DialogService,
-    public i18n: I18nService
+    public i18n: I18nService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -197,6 +200,16 @@ loadRentals(): void {
   });
 }
 
+navigateToSaleRent(rental: any) {
+  const id = rental?.tenantId || rental?.id || rental?.tenantID;
+
+  if (!id) {
+    console.error("No tenant ID found in rental object", rental);
+    return;
+  }
+
+  this.router.navigate(['/rentals/sale-rant', id]);
+}
 
 
   openAddDialog(): void {

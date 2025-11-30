@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ReportService, ReportData, ReportFilters } from '@core/services/report.service';
+import { ReportService, ReportData } from '@core/services/report.service';
 import { BrandService } from '@core/services/brand.service';
 import { Brand } from '@core/models/brand.model';
 import { I18nService } from '@shared/services/i18n.service';
@@ -33,8 +33,10 @@ import { MessageService } from 'primeng/api';
             <div class="form-field">
               <label>Contract Type</label>
               <p-dropdown 
-                [options]="contractTypes" 
-                formControlName="contractType"
+               [options]="contractTypes"
+  optionLabel="label"
+  optionValue="value"
+                formControlName="RentType"
                 [showClear]="true"
                 placeholder="All Types"
               ></p-dropdown>
@@ -43,8 +45,10 @@ import { MessageService } from 'primeng/api';
             <div class="form-field">
               <label>Profitability Status</label>
               <p-dropdown 
-                [options]="profitabilityStatuses" 
-                formControlName="profitabilityStatus"
+               [options]="profitabilityStatuses"
+  optionLabel="label"
+  optionValue="value"
+                formControlName="status"
                 [showClear]="true"
                 placeholder="All Statuses"
               ></p-dropdown>
@@ -225,8 +229,15 @@ export class ReportsComponent implements OnInit {
   filterForm!: FormGroup;
   brands: Brand[] = [];
   reportData: ReportData[] = [];
-  contractTypes = ['MonthlyRent', 'PercentageOfSales'];
-  profitabilityStatuses = ['Profitable', 'Losing', 'BreakingEven'];
+ profitabilityStatuses = [
+  { label: 'Profitable', value: 1 },
+  { label: 'Losing', value: 2 },
+  { label: 'Breaking Even', value: 3 }
+];
+contractTypes = [
+  { label: 'Monthly Rent', value: 1 },
+  { label: 'Percentage Of Sales', value: 2 }
+];
 
   constructor(
     private fb: FormBuilder,
@@ -238,12 +249,15 @@ export class ReportsComponent implements OnInit {
 
   ngOnInit(): void {
     this.filterForm = this.fb.group({
-      brandId: [null],
-      contractType: [null],
-      profitabilityStatus: [null],
-      startDate: [null],
-      endDate: [null]
-    });
+  filter: [''],
+  brandId: [null],
+  RentType: [null],
+  activityId: [null],
+  startDate: [null],
+  endDate: [null],
+  status:[null]
+});
+
 
     this.loadBrands();
   }
@@ -256,33 +270,36 @@ export class ReportsComponent implements OnInit {
     });
   }
 
-  generateReport(): void {
-    const filters: ReportFilters = {
-      brandId: this.filterForm.value.brandId,
-      contractType: this.filterForm.value.contractType,
-      profitabilityStatus: this.filterForm.value.profitabilityStatus,
-      startDate: this.filterForm.value.startDate,
-      endDate: this.filterForm.value.endDate
-    };
+ generateReport(): void {
+  const f = this.filterForm.value;
 
-   /*  this.reportService.generateReport(filters).subscribe({
-      next: (data) => {
-        this.reportData = data;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: `Report generated with ${data.length} records`
-        });
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to generate report'
-        });
-      }
-    }); */
-  }
+  const dynamicFilters = {
+    filter: f.filter || '',
+    rentType: f.RentType || null,
+    pageNumber: 1,
+    pageSize: 10,
+    activityId: f.activityId,
+    brandId: f.brandId
+  };
+
+  this.reportService.getTenantsFromRealApi(dynamicFilters).subscribe({
+    next: (res) => {
+      this.reportData = res.data.map(t => ({
+        brandName: t.brand?.name,
+        contractType: t.rentType,
+        rentalAmount: t.rentValue,
+        startDate: t.createdOn,
+        endDate: null,
+        annualRevenue: t.totalSales,
+        profitLossStatus: t.status,
+        profit: t.totalSales - t.totalRent,
+        profitMargin: t.totalSales > 0 ?
+          ((t.totalSales - t.totalRent) / t.totalSales) * 100 : 0
+      }));
+    }
+  });
+}
+
 
   clearFilters(): void {
     this.filterForm.reset();
