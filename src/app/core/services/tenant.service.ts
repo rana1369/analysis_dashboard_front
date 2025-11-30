@@ -8,7 +8,7 @@ import { TenantResponse } from './report.service';
 })
 export class TenantService {
 
-  private apiUrl = '/api/Tenant';
+  private apiUrl = 'http://galalshaaban99-001-site1.anytempurl.com/api/Tenant';
 
   constructor(private http: HttpClient) { }
 

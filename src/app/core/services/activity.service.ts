@@ -8,7 +8,7 @@ import { Activity, ActivityFormData, ActivityApiResponse } from '../models/activ
   providedIn: 'root'
 })
 export class ActivityService {
-  private apiUrl = `/api/Activity`;
+  private apiUrl = `http://galalshaaban99-001-site1.anytempurl.com/api/Activity`;
 
   constructor(private http: HttpClient) {}
 

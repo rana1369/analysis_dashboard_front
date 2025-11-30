@@ -8,7 +8,7 @@ import { Rental } from '../models/rental.model';
   providedIn: 'root'
 })
 export class RentalService {
-  private apiUrl = `/api/Tenant`;
+  private apiUrl = `http://galalshaaban99-001-site1.anytempurl.com/api/Tenant`;
 
   constructor(private http: HttpClient) {}
 
