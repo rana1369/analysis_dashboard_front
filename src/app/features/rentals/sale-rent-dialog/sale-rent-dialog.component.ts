@@ -19,20 +19,23 @@ import { forkJoin } from 'rxjs';
       <h3>{{ isEditMode ? i18n.translate('rentals.edit') : i18n.translate('rentals.sale') }}</h3>
       
      <form [formGroup]="saleRentForm" (ngSubmit)="onSubmit()" class="rental-form">
-      <div class="form-grid-two">
+     <div class="form-grid-two">
   <div class="form-field">
     <label>Sales Value *</label>
     <input type="text" pInputText formControlName="salesValue" class="w-full" />
   </div>
-<div class="form-field">
+
+  <div class="form-field">
     <label>Rent Value *</label>
     <input type="text" pInputText formControlName="rentValue" class="w-full" />
   </div>
-      </div>
-<div class="form-field">
-    <label>period*</label>
-    <input type="text" pInputText formControlName="period" class="w-full" />
+
+  <div class="form-field">
+    <label>Period *</label>
+    <input type="date" pInputText formControlName="period" class="w-full" />
   </div>
+</div>
+
   <div class="form-actions">
     <button pButton type="button" label="Cancel" class="p-button-secondary" (click)="ref.close()"></button>
     <button pButton type="submit" label="Save" [disabled]="saleRentForm.invalid"></button>

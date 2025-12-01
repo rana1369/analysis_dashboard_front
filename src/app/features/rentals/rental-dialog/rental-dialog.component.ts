@@ -42,7 +42,7 @@ formControlName="description" class="w-full"></textarea>
 
   <div class="form-field">
     <label>Activity *</label>
-    <p-dropdown [options]="brands" formControlName="brandId" optionLabel="name" optionValue="id" class="w-full"></p-dropdown>
+    <p-dropdown [options]="activities" formControlName="activityId" optionLabel="name" optionValue="id" class="w-full"></p-dropdown>
   </div>
 </div>
 <div class="form-grid-two">
@@ -56,6 +56,10 @@ formControlName="description" class="w-full"></textarea>
     <input type="text" pInputText formControlName="responsiblePerson" class="w-full" />
   </div>
 </div>
+<div class="form-field">
+    <label>Rent Type *</label>
+    <p-dropdown [options]="rentTypeOptions" formControlName="rentType" optionLabel="label" optionValue="value" class="w-full"></p-dropdown>
+  </div>
 <div class="form-grid-two">
   <div class="form-field">
     <label>Contract Duration (months) *</label>
@@ -69,10 +73,7 @@ formControlName="description" class="w-full"></textarea>
 </div>
 <div class="form-grid-two">
  
-<div class="form-field">
-    <label>Rent Type *</label>
-    <p-dropdown [options]="rentTypeOptions" formControlName="rentType" optionLabel="label" optionValue="value" class="w-full"></p-dropdown>
-  </div>
+
   <div class="form-field" *ngIf="rentalForm.get('rentType')?.value === 2">
     <label>Percentage Value (%) *</label>
     <p-inputNumber formControlName="percentageValue" [min]="0" [max]="100" [showButtons]="true" class="w-full"></p-inputNumber>
@@ -123,7 +124,7 @@ formControlName="description" class="w-full"></textarea>
       padding: 1.5rem;
       min-width: 600px;
     }
-
+    
     .rental-dialog h3 {
       margin: 0 0 1.5rem 0;
       font-size: 1.5rem;
@@ -250,7 +251,7 @@ rentCollectOptions = [
     this.isEditMode = !!rental;
 
     this.loadBrands();
-
+  this.loadActivities();
    this.rentalForm = this.fb.group({
   name: [rental?.name || '', Validators.required],
   unitNumber: [rental?.unitNumber || '', Validators.required],

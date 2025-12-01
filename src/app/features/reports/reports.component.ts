@@ -123,39 +123,53 @@ import { MessageService } from 'primeng/api';
           </div>
         </ng-template>
 
-        <p-table [value]="reportData" [paginator]="true" [rows]="20">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>Brand Name</th>
-              <th>Contract Type</th>
-              <th>Rental Value</th>
-              <th>Start Date</th>
-              <th>End Date</th>
-              <th>Annual Revenue</th>
-              <th>Status</th>
-              <th>Profit</th>
-              <th>Margin %</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-data>
-            <tr>
-              <td>{{ data.brandName }}</td>
-              <td>{{ data.contractType }}</td>
-              <td>{{ data.rentalAmount ? (data.rentalAmount | currency) : (data.percentageValue + '%') }}</td>
-              <td>{{ data.startDate | date:'shortDate' }}</td>
-              <td>{{ data.endDate | date:'shortDate' }}</td>
-              <td>{{ data.annualRevenue | currency }}</td>
-              <td>
-                <p-tag 
-                  [value]="data.profitLossStatus"
-                  [severity]="getStatusSeverity(data.profitLossStatus)"
-                ></p-tag>
-              </td>
-              <td>{{ data.profit | currency }}</td>
-              <td>{{ data.profitMargin | number:'1.2-2' }}%</td>
-            </tr>
-          </ng-template>
-        </p-table>
+       <p-table [value]="reportData" [paginator]="true" [rows]="20">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Brand</th>
+      <th>Name</th>
+      <th>Unit</th>
+      <th style="min-width: 200px;">Description</th>
+      <th>Rent Value</th>
+      <th>Rent Type</th>
+      <th>Sales Collect</th>
+      <th>Rent Collect</th>
+      <th>Total Rent</th>
+      <th>Total Sales</th>
+      <th>Rent % Over Sales</th>
+      <th>Activity</th>
+      <th>Status</th>
+      <th>Created On</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-t>
+    <tr>
+      <td>{{ t.brand?.name }}</td>
+      <td>{{ t.name }}</td>
+      <td>{{ t.unitNumber }}</td>
+      <td style="min-width: 200px;">{{ t.description }}</td>
+      <td>{{ t.rentValue }}</td>
+      <td>{{ t.rentType }}</td>
+      <td>{{ t.salesCollectType }}</td>
+      <td>{{ t.rentCollectType }}</td>
+      <td>{{ t.totalRent }}</td>
+      <td>{{ t.totalSales }}</td>
+      <td>{{ t.totalRentOverTotalSales | number:'1.2-2' }}%</td>
+      <td>{{ t.activity?.name }}</td>
+      
+      <td>
+        <p-tag 
+          [value]="t.status"
+          [severity]="getStatusSeverity(t.status)"
+        ></p-tag>
+      </td>
+      
+      <td>{{ t.createdOn | date:'short' }}</td>
+    </tr>
+  </ng-template>
+</p-table>
+
       </p-card>
     </div>
   `,
@@ -270,35 +284,25 @@ contractTypes = [
     });
   }
 
- generateReport(): void {
+generateReport(): void {
   const f = this.filterForm.value;
 
   const dynamicFilters = {
     filter: f.filter || '',
     rentType: f.RentType || null,
     pageNumber: 1,
-    pageSize: 10,
+    pageSize: 50,
     activityId: f.activityId,
     brandId: f.brandId
   };
 
   this.reportService.getTenantsFromRealApi(dynamicFilters).subscribe({
     next: (res) => {
-      this.reportData = res.data.map(t => ({
-        brandName: t.brand?.name,
-        contractType: t.rentType,
-        rentalAmount: t.rentValue,
-        startDate: t.createdOn,
-        endDate: null,
-        annualRevenue: t.totalSales,
-        profitLossStatus: t.status,
-        profit: t.totalSales - t.totalRent,
-        profitMargin: t.totalSales > 0 ?
-          ((t.totalSales - t.totalRent) / t.totalSales) * 100 : 0
-      }));
+      this.reportData = res.data;  
     }
   });
 }
+
 
 
   clearFilters(): void {

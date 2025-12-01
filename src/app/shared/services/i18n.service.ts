@@ -70,7 +70,11 @@ export class I18nService {
     // Financial
     'financial.title': 'Financial Analysis',
     'financial.profitable': 'Profitable',
-    
+        'financial.rentalValue': 'Rental Value',
+    'financial.profit': 'Profitable',
+        'financial.status': 'status',
+
+
     'financial.losing': 'Losing',
     'financial.breakingEven': 'Breaking Even',
     'financial.totalRevenue': 'Total Annual Rental Revenue',
